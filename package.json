@@ -1,0 +1,9 @@
+{
+  "name": "otak-atik",
+  "private": true,
+  "type": "module",
+  "description": "Kumpulan puzzle statis untuk orang dewasa. Tanpa build step, tanpa dependensi.",
+  "scripts": {
+    "test": "node --test \"tests/*.test.mjs\""
+  }
+}
