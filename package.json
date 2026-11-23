@@ -2,7 +2,7 @@
   "name": "otak-atik",
   "private": true,
   "type": "module",
-  "description": "Kumpulan puzzle statis untuk orang dewasa. Tanpa build step, tanpa dependensi.",
+  "description": "Static puzzle collection for adults. No build step, no dependencies.",
   "scripts": {
     "test": "node --test \"tests/*.test.mjs\""
   }

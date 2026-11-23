@@ -1,11 +1,11 @@
-// Mesin sudoku murni: tanpa DOM, bisa dites dengan Node.
-// Papan = array 81 angka (0 = kosong), indeks = baris * 9 + kolom.
+// Pure sudoku engine: no DOM, testable with Node.
+// A board is an array of 81 digits (0 = empty); index = row * 9 + column.
 
 const ALL = 0x1ff;
 const bit = (d) => 1 << (d - 1);
 
 const POP = new Uint8Array(512);
-const DIG = new Uint8Array(512); // digit untuk mask satu-bit
+const DIG = new Uint8Array(512); // digit for a single-bit mask
 for (let m = 1; m < 512; m++) POP[m] = POP[m >> 1] + (m & 1);
 for (let d = 1; d <= 9; d++) DIG[bit(d)] = d;
 
@@ -28,15 +28,15 @@ export const PEERS = Array.from({ length: 81 }, (_, i) => {
   return [...s];
 });
 
-// target = jumlah petunjuk yang dikejar generator, max = batas terima.
-// tech    = teknik yang harus cukup untuk menyelesaikan puzzle.
-// stall   = [min, max] sel kosong yang tersisa setelah teknik single buntu
-//           (untuk level yang butuh lebih dari single).
+// target = number of clues the generator aims for, max = acceptance limit.
+// tech   = technique that must be enough to solve the puzzle.
+// stall  = [min, max] empty cells left once the singles techniques get stuck
+//          (for levels that need more than singles).
 export const LEVELS = {
   newbie: { label: 'Newbie', target: 44, max: 46, tech: 'naked' },
-  mudah: { label: 'Mudah', target: 36, max: 38, tech: 'singles' },
-  sedang: { label: 'Sedang', target: 30, max: 34, tech: 'singles' },
-  sulit: { label: 'Sulit', target: 26, max: 30, stall: [1, 36] },
+  easy: { label: 'Easy', target: 36, max: 38, tech: 'singles' },
+  medium: { label: 'Medium', target: 30, max: 34, tech: 'singles' },
+  hard: { label: 'Hard', target: 26, max: 30, stall: [1, 36] },
   extreme: { label: 'Extreme', target: 22, max: 25, stall: [37, 81] },
 };
 
@@ -59,15 +59,15 @@ function shuffle(arr, rng) {
   return arr;
 }
 
-// Bitmask angka yang masih mungkin untuk sel i.
+// Bitmask of the digits still possible for cell i.
 export function candMask(g, i) {
   let m = ALL;
   for (const j of PEERS[i]) if (g[j]) m &= ~bit(g[j]);
   return m;
 }
 
-// Cari solusi dengan backtracking (sel dengan kandidat paling sedikit dulu).
-// Berhenti setelah `limit` solusi. Dengan rng, urutan angka diacak.
+// Find solutions by backtracking (fewest-candidates cell first).
+// Stops after `limit` solutions. With an rng, the digit order is shuffled.
 export function solve(grid, limit = 1, rng = null) {
   const cells = grid.slice();
   const rows = new Array(9).fill(0);
@@ -130,9 +130,9 @@ export function solve(grid, limit = 1, rng = null) {
 
 export const countSolutions = (grid, limit = 2) => solve(grid, limit).count;
 
-// Selesaikan hanya dengan teknik manusia paling dasar.
-//   hidden=false: hanya naked single (sel dengan satu kandidat)
-//   hidden=true : ditambah hidden single (angka yang hanya punya satu tempat di baris/kolom/kotak)
+// Solve using only the most basic human techniques.
+//   hidden=false: naked singles only (a cell with a single candidate)
+//   hidden=true : plus hidden singles (a digit with only one place in a row/column/box)
 export function solveBySingles(puzzle, hidden = true) {
   const g = puzzle.slice();
   let progress = true;
@@ -179,7 +179,7 @@ export function isValidSolved(g) {
   return UNITS.every((u) => new Set(u.map((i) => g[i])).size === 9);
 }
 
-// Indeks sel terisi yang bertabrakan dengan sel lain di baris/kolom/kotak yang sama.
+// Indices of filled cells that clash with another cell in the same row/column/box.
 export function conflicts(cells) {
   const bad = new Set();
   for (let i = 0; i < 81; i++) {
@@ -194,12 +194,12 @@ export function conflicts(cells) {
   return bad;
 }
 
-// Setiap level punya syarat bentuk, lalu dicek ulang sebelum dikembalikan:
-//   newbie  : solusi tunggal, selesai hanya dengan naked single
-//   mudah, sedang: solusi tunggal, selesai dengan naked + hidden single
-//   sulit   : solusi tunggal, single buntu dengan sedikit sel tersisa
-//   extreme : solusi tunggal, petunjuk paling sedikit, single buntu dengan
-//             banyak sel tersisa (butuh teknik lanjutan atau coba-coba)
+// Each level has its own shape requirements, re-checked before returning:
+//   newbie        : unique solution, solvable with naked singles only
+//   easy, medium  : unique solution, solvable with naked + hidden singles
+//   hard          : unique solution, singles get stuck with few cells left
+//   extreme       : unique solution, fewest clues, singles get stuck with
+//                   many cells left (needs advanced techniques or guessing)
 function accepts(level, puzzle, clues) {
   if (clues > level.max) return false;
   if (level.stall) {
@@ -232,7 +232,7 @@ function makeAttempt(level, rng) {
 
 export function generate(levelKey, rng = Math.random, maxAttempts = 300) {
   const level = LEVELS[levelKey];
-  if (!level) throw new Error(`Level tidak dikenal: ${levelKey}`);
+  if (!level) throw new Error(`Unknown level: ${levelKey}`);
   let best = null;
   for (let n = 0; n < maxAttempts; n++) {
     const r = makeAttempt(level, rng);

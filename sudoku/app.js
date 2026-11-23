@@ -16,7 +16,7 @@ const store = {
   set(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
-    } catch { /* penyimpanan tidak tersedia: game tetap jalan */ }
+    } catch { /* storage unavailable: the game still works */ }
   },
 };
 
@@ -70,7 +70,7 @@ for (let d = 1; d <= 9; d++) {
   const b = document.createElement('button');
   b.type = 'button';
   b.innerHTML = `${d}<small></small>`;
-  b.setAttribute('aria-label', `Angka ${d}`);
+  b.setAttribute('aria-label', `Digit ${d}`);
   b.addEventListener('click', () => input(d));
   els.pad.appendChild(b);
   padEls.push(b);
@@ -107,7 +107,7 @@ function newGame(levelKey) {
   if (busy) return;
   busy = true;
   els.loading.hidden = false;
-  // Beri browser kesempatan menggambar "Menyiapkan…" sebelum generator berjalan.
+  // Let the browser paint "Preparing puzzle…" before the generator runs.
   setTimeout(() => {
     const g = generate(levelKey);
     start({
@@ -131,7 +131,7 @@ function hasProgress() {
 
 function chooseLevel(key) {
   if (key === S?.level && !hasProgress()) return newGame(key);
-  if (hasProgress() && !confirm('Mulai game baru? Progres game ini akan hilang.')) return;
+  if (hasProgress() && !confirm('Start a new game? Progress on this game will be lost.')) return;
   newGame(key);
 }
 
@@ -162,7 +162,7 @@ function render() {
     for (let d = 0; d < 9; d++) noteSpans[d].textContent = !v && S.notes[i] & (1 << d) ? d + 1 : '';
     const r = ((i / 9) | 0) + 1;
     const c = (i % 9) + 1;
-    el.setAttribute('aria-label', `Baris ${r}, kolom ${c}, ${v ? (given ? 'angka ' + v + ', petunjuk' : 'angka ' + v) : 'kosong'}`);
+    el.setAttribute('aria-label', `Row ${r}, column ${c}, ${v ? (given ? 'digit ' + v + ', given' : 'digit ' + v) : 'empty'}`);
     el.tabIndex = i === (selected >= 0 ? selected : 0) ? 0 : -1;
   }
 
@@ -173,7 +173,7 @@ function render() {
   });
   for (const b of els.levels.children) b.setAttribute('aria-pressed', String(b.dataset.level === S.level));
   els.notes.setAttribute('aria-pressed', String(noteMode));
-  els.notes.textContent = `✎ Catatan: ${noteMode ? 'nyala' : 'mati'}`;
+  els.notes.textContent = `✎ Notes: ${noteMode ? 'on' : 'off'}`;
   els.time.textContent = fmt(S.seconds);
 }
 
@@ -227,7 +227,7 @@ function hint() {
   if (!S || S.done) return;
   let i = selected;
   if (i < 0 || S.puzzle[i] || S.cells[i] === S.solution[i]) {
-    // Pilih sel kosong yang hanya punya satu kandidat; kalau tidak ada, sel kosong pertama.
+    // Prefer a wrong cell, then an empty cell with a single candidate, else the first empty cell.
     const empties = S.cells.map((v, k) => (v === 0 ? k : -1)).filter((k) => k >= 0);
     const wrongs = S.cells.map((v, k) => (v && v !== S.solution[k] ? k : -1)).filter((k) => k >= 0);
     const pool = wrongs.length ? wrongs : empties;
@@ -245,20 +245,20 @@ function hint() {
   S.hints++;
   selected = i;
   afterChange();
-  setStatus(`Petunjuk dipakai: ${S.hints}`);
+  setStatus(`Hints used: ${S.hints}`);
 }
 
 function check() {
   if (!S || S.done) return;
   wrongMarks = new Set(S.cells.map((v, k) => (v && v !== S.solution[k] ? k : -1)).filter((k) => k >= 0));
   render();
-  setStatus(wrongMarks.size ? `${wrongMarks.size} angka salah ditandai merah.` : 'Semua angka yang terisi sudah benar.');
+  setStatus(wrongMarks.size ? `${wrongMarks.size} wrong ${wrongMarks.size === 1 ? 'digit is' : 'digits are'} marked in red.` : 'Every digit you entered so far is correct.');
 }
 
 function afterChange() {
   if (S.cells.every((v, i) => v === S.solution[i])) return win();
-  if (S.cells.every(Boolean)) setStatus('Semua kotak terisi, tapi masih ada angka yang salah.');
-  else if (!els.status.textContent.startsWith('Petunjuk')) setStatus('');
+  if (S.cells.every(Boolean)) setStatus('Every cell is filled, but some digits are wrong.');
+  else if (!els.status.textContent.startsWith('Hints used')) setStatus('');
   render();
   persist();
 }
@@ -266,17 +266,17 @@ function afterChange() {
 function win() {
   S.done = true;
   const best = store.get(BEST_KEY, {});
-  let msg = `Level ${LEVELS[S.level].label}, waktu ${fmt(S.seconds)}, petunjuk dipakai ${S.hints}.`;
+  let msg = `${LEVELS[S.level].label} level, time ${fmt(S.seconds)}, hints used ${S.hints}.`;
   if (S.hints === 0) {
     if (best[S.level] === undefined || S.seconds < best[S.level]) {
-      msg += best[S.level] === undefined ? ' Rekor pertamamu.' : ' Rekor baru!';
+      msg += best[S.level] === undefined ? ' Your first best time.' : ' New best time!';
       best[S.level] = S.seconds;
       store.set(BEST_KEY, best);
     } else {
-      msg += ` Rekormu: ${fmt(best[S.level])}.`;
+      msg += ` Your best: ${fmt(best[S.level])}.`;
     }
   } else {
-    msg += ' Rekor hanya dihitung tanpa petunjuk.';
+    msg += ' Best times only count without hints.';
   }
   render();
   persist();
@@ -317,7 +317,7 @@ document.addEventListener('keydown', (e) => {
   e.preventDefault();
 });
 
-// Timer: hanya berjalan saat tab terlihat dan game belum selesai.
+// Timer: runs only while the tab is visible and the game is not finished.
 setInterval(() => {
   if (!S || S.done || document.hidden || busy) return;
   S.seconds++;

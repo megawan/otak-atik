@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sudoku · Otak-Atik</title>
-  <meta name="description" content="Sudoku lima level, dari Newbie sampai Extreme.">
+  <meta name="description" content="Sudoku in five levels, from Newbie to Extreme.">
   <link rel="stylesheet" href="../shared/style.css">
   <link rel="stylesheet" href="sudoku.css">
 </head>
@@ -12,7 +12,7 @@
   <main class="wrap">
     <header class="top">
       <a class="back" href="../">← Otak-Atik</a>
-      <div class="time" id="time" role="timer" aria-label="Waktu bermain">00:00</div>
+      <div class="time" id="time" role="timer" aria-label="Elapsed time">00:00</div>
     </header>
 
     <h1>Sudoku</h1>
@@ -20,31 +20,31 @@
     <div class="levels" id="levels" role="group" aria-label="Level"></div>
 
     <div class="board-wrap">
-      <div class="board" id="board" role="grid" aria-label="Papan sudoku"></div>
-      <div class="loading" id="loading" hidden>Menyiapkan puzzle…</div>
+      <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
+      <div class="loading" id="loading" hidden>Preparing puzzle…</div>
     </div>
 
     <p class="status" id="status" role="status" aria-live="polite"></p>
 
     <div class="tools">
       <button class="btn" id="undo">↩ Undo</button>
-      <button class="btn" id="erase">⌫ Hapus</button>
-      <button class="btn" id="notes" aria-pressed="false">✎ Catatan: mati</button>
-      <button class="btn" id="hint">💡 Petunjuk</button>
-      <button class="btn" id="check">✓ Periksa</button>
+      <button class="btn" id="erase">⌫ Erase</button>
+      <button class="btn" id="notes" aria-pressed="false">✎ Notes: off</button>
+      <button class="btn" id="hint">💡 Hint</button>
+      <button class="btn" id="check">✓ Check</button>
     </div>
 
-    <div class="pad" id="pad" role="group" aria-label="Papan angka"></div>
+    <div class="pad" id="pad" role="group" aria-label="Number pad"></div>
 
-    <p class="keys muted">Keyboard: 1–9 isi, 0/Backspace hapus, panah pindah, N catatan, Z undo, H petunjuk.</p>
+    <p class="keys muted">Keyboard: 1–9 fill, 0/Backspace erase, arrows move, N notes, Z undo, H hint.</p>
   </main>
 
   <dialog id="win">
-    <h2>Selesai! 🎉</h2>
+    <h2>Solved! 🎉</h2>
     <p id="win-text"></p>
     <form method="dialog" class="win-actions">
-      <button class="btn" value="close">Tutup</button>
-      <button class="btn primary" value="again" id="again">Main lagi</button>
+      <button class="btn" value="close">Close</button>
+      <button class="btn primary" value="again" id="again">Play again</button>
     </form>
   </dialog>
 
