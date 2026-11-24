@@ -7,12 +7,6 @@
   --line-strong: #2b2620;
   --accent: #d9622b;
   --accent-ink: #fff;
-  --user: #1f5fbf;
-  --err: #c62f2f;
-  --err-bg: #fbe0dc;
-  --sel: #ffd9a8;
-  --peer: #f4ead6;
-  --same: #ffe9b8;
   --radius: 14px;
   color-scheme: light;
 }
@@ -27,13 +21,7 @@
     --line-strong: #efe8da;
     --accent: #f08a52;
     --accent-ink: #1b1814;
-    --user: #7db2ff;
-    --err: #ff8a80;
-    --err-bg: #4a2420;
-    --sel: #6b4a22;
-    --peer: #302a21;
-    --same: #5a4520;
-    color-scheme: dark;
+                color-scheme: dark;
   }
 }
 
