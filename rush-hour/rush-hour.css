@@ -1,0 +1,90 @@
+:root { --road: #3b4147; --road-line: #4d555c; --edge: #1b2327; --n: 6; }
+
+.top { display: flex; justify-content: space-between; align-items: center; }
+.back { text-decoration: none; color: var(--muted); }
+.back:hover { color: var(--ink); }
+.total { font-variant-numeric: tabular-nums; font-weight: 600; }
+h1 { margin: 8px 0 4px; font-size: 1.8rem; letter-spacing: -0.02em; }
+[hidden] { display: none !important; }
+
+/* level list */
+.tier { margin: 20px 0 0; }
+.tier h2 { margin: 0; font-size: 1.15rem; display: flex; justify-content: space-between; align-items: baseline; }
+.tier h2 small { font-size: .8rem; font-weight: 400; color: var(--muted); }
+.tier p { margin: 0 0 8px; }
+.levels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.lv {
+  min-height: 52px; border: 1.5px solid var(--line); background: var(--surface); border-radius: 12px;
+  padding: 4px 0; display: grid; place-items: center; line-height: 1.15;
+}
+.lv:hover { border-color: var(--ink); }
+.lv b { font-size: 1.05rem; }
+.lv span { font-size: .75rem; letter-spacing: 1px; color: var(--accent); min-height: 1em; }
+.lv.done { border-color: var(--accent); }
+
+/* play */
+.bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 4px; }
+.bar h2 { margin: 0; font-size: 1.3rem; }
+.stats { display: flex; gap: 22px; margin: 6px 0 14px; }
+.stats div { line-height: 1.15; }
+.stats b { display: block; font-size: 1.5rem; font-variant-numeric: tabular-nums; }
+.stats small { color: var(--muted); }
+.boardwrap { padding-right: 30px; }
+.board {
+  position: relative; width: 100%; aspect-ratio: 1;
+  background:
+    linear-gradient(var(--road-line) 1px, transparent 1px) 0 0 / calc(100% / var(--n)) calc(100% / var(--n)),
+    linear-gradient(90deg, var(--road-line) 1px, transparent 1px) 0 0 / calc(100% / var(--n)) calc(100% / var(--n)),
+    var(--road);
+  border: 6px solid var(--edge); border-right: 0; border-radius: var(--radius) 0 0 var(--radius);
+  touch-action: none;
+}
+.board::before, .board::after { content: ""; position: absolute; right: -6px; width: 6px; background: var(--edge); }
+.board::before { top: -6px; height: calc(2 * 100% / var(--n) + 6px); }
+.board::after { bottom: -6px; height: calc(3 * 100% / var(--n) + 6px); }
+.exit {
+  position: absolute; left: 100%; top: calc(2 * 100% / var(--n)); height: calc(100% / var(--n)); width: 30px;
+  display: grid; place-items: center; font-size: .65rem; letter-spacing: .08em; color: var(--accent);
+  background: repeating-linear-gradient(90deg, var(--road) 0 6px, var(--road-line) 6px 8px);
+}
+.car {
+  position: absolute; padding: 0; border: 0; background: none;
+  left: calc(var(--x) * 100% / var(--n)); top: calc(var(--y) * 100% / var(--n));
+  width: calc(var(--w) * 100% / var(--n)); height: calc(var(--h) * 100% / var(--n));
+  transition: left .22s ease, top .22s ease, opacity .5s;
+  cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; z-index: 2;
+}
+.car.drag { transition: none; cursor: grabbing; z-index: 4; }
+.car.leave { transition: left .9s ease-in, opacity .9s ease-in; opacity: 0; z-index: 4; }
+.car .cs { position: absolute; left: 6%; top: 6%; width: 88%; height: 88%; overflow: visible; pointer-events: none; transition: filter .15s; }
+.car:focus-visible { outline: none; }
+.car:focus-visible .cs, .car.drag .cs { filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 1px var(--accent)); }
+.cs .sh { fill: rgba(0,0,0,.2); }
+.cs .cb { fill: var(--c); stroke: rgba(0,0,0,.3); stroke-width: 1.5; }
+.cs .cg { fill: #f1f5f9; stroke: rgba(0,0,0,.3); stroke-width: 1.5; }
+.cs .gl { fill: #2b3b4f; }
+.cs .cr { fill: rgba(255,255,255,.26); }
+.cs .pw { fill: #f8fafc; stroke: rgba(0,0,0,.25); stroke-width: 1; }
+.cs .gh { fill: rgba(255,255,255,.3); }
+.cs .ln { fill: none; stroke: rgba(0,0,0,.2); stroke-width: 1.5; }
+.cs .wh { fill: #111827; }
+.cs .lt { fill: #fff4b0; }
+.cs .tl { fill: #ef4444; }
+.cs .lb1 { fill: #ef4444; animation: lightbar 1s steps(1) infinite; }
+.cs .lb2 { fill: #3b82f6; animation: lightbar 1s steps(1) infinite reverse; }
+@keyframes lightbar { 0% { opacity: 1; } 50% { opacity: .25; } }
+
+.tools { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.keys { font-size: .85rem; margin: 14px 0 0; }
+
+dialog {
+  border: 1.5px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink);
+  padding: 22px 24px; max-width: min(92vw, 360px); text-align: center;
+}
+dialog::backdrop { background: rgba(0,0,0,.55); }
+dialog h2 { margin: 0; font-size: 1.5rem; }
+dialog p { margin: 6px 0 14px; }
+.stars { font-size: 2.2rem; letter-spacing: 6px; color: var(--accent); line-height: 1.2; }
+.stars .off { opacity: .25; }
+dialog .tools { justify-content: center; margin-top: 0; }
+@media (prefers-reduced-motion: reduce) { .car, .car.leave { transition: none; } .cs .lb1, .cs .lb2 { animation: none; } }

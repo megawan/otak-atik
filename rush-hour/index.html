@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rush Hour · Otak-Atik</title>
+  <meta name="description" content="Slide the cars out of the way and drive the red car out of the jam. Sixty levels, from Newbie to Extreme.">
+  <link rel="stylesheet" href="../shared/style.css">
+  <link rel="stylesheet" href="rush-hour.css">
+</head>
+<body>
+  <main class="wrap">
+    <section id="menu">
+      <header class="top">
+        <a class="back" href="../">← Otak-Atik</a>
+        <span class="total" id="total"></span>
+      </header>
+      <h1>Rush Hour</h1>
+      <p class="muted">Slide the cars out of the way and drive the red car out of the exit on the right. Cars only move forwards and backwards. Fewer moves earn more stars.</p>
+      <div id="tiers"></div>
+    </section>
+
+    <section id="play" hidden>
+      <header class="bar">
+        <button class="btn" id="back" type="button">← Levels</button>
+        <h2 id="title"></h2>
+      </header>
+      <div class="stats">
+        <div><b id="moves">0</b><small>moves</small></div>
+        <div><b id="best">0</b><small>fewest possible</small></div>
+      </div>
+      <div class="boardwrap">
+        <div class="board" id="board" role="group" aria-label="Traffic jam. Pick a car and drag it, or use the arrow keys.">
+          <div class="exit" aria-hidden="true">EXIT</div>
+        </div>
+      </div>
+      <div class="tools">
+        <button class="btn" id="undo" type="button">↩ Undo</button>
+        <button class="btn" id="restart" type="button">Restart</button>
+      </div>
+      <p class="keys muted">Drag a car, or Tab to a car and use the arrow keys.</p>
+    </section>
+  </main>
+
+  <dialog id="win" aria-labelledby="win-title">
+    <h2 id="win-title">Road clear</h2>
+    <div class="stars" id="win-stars" aria-hidden="true"></div>
+    <p id="win-text"></p>
+    <div class="tools">
+      <button class="btn" id="win-menu" type="button">Levels</button>
+      <button class="btn" id="win-again" type="button">Replay</button>
+      <button class="btn primary" id="win-next" type="button">Next level</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
