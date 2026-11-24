@@ -1,3 +1,23 @@
+:root {
+  --user: #1f5fbf;
+  --err: #c62f2f;
+  --err-bg: #fbe0dc;
+  --sel: #ffd9a8;
+  --peer: #f4ead6;
+  --same: #ffe9b8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --user: #7db2ff;
+    --err: #ff8a80;
+    --err-bg: #4a2420;
+    --sel: #6b4a22;
+    --peer: #302a21;
+    --same: #5a4520;
+  }
+}
+
 .top { display: flex; justify-content: space-between; align-items: center; }
 .back { text-decoration: none; color: var(--muted); }
 .back:hover { color: var(--ink); }
