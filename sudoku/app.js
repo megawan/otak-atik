@@ -1,4 +1,5 @@
 import { LEVELS, generate, PEERS, candMask, conflicts } from './engine.js';
+import { play, rise, interactive, spring, reduced } from '../shared/fx.js';
 
 const $ = (s) => document.querySelector(s);
 const SAVE_KEY = 'otak-atik.sudoku.game';
@@ -65,6 +66,11 @@ for (const [key, lv] of Object.entries(LEVELS)) {
   els.levels.appendChild(b);
 }
 
+const pill = document.createElement('span');
+pill.className = 'pill';
+pill.setAttribute('aria-hidden', 'true');
+els.levels.prepend(pill);
+
 const padEls = [];
 for (let d = 1; d <= 9; d++) {
   const b = document.createElement('button');
@@ -101,6 +107,7 @@ function start(game) {
   setStatus('');
   render();
   persist();
+  boardIn();
 }
 
 function newGame(levelKey) {
@@ -137,6 +144,7 @@ function chooseLevel(key) {
 
 function setStatus(msg) {
   els.status.textContent = msg;
+  if (msg) play(els.status, { opacity: [0, 1], y: [8, 0] }, { duration: 0.3 });
 }
 
 // ---------- render ----------
@@ -171,10 +179,57 @@ function render() {
     b.disabled = left <= 0;
     b.querySelector('small').textContent = left > 0 ? left : '';
   });
-  for (const b of els.levels.children) b.setAttribute('aria-pressed', String(b.dataset.level === S.level));
+  for (const b of els.levels.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.level === S.level));
+  movePill();
   els.notes.setAttribute('aria-pressed', String(noteMode));
   els.notes.textContent = `✎ Notes: ${noteMode ? 'on' : 'off'}`;
   els.time.textContent = fmt(S.seconds);
+}
+
+let pillPlaced = false;
+function movePill() {
+  const active = els.levels.querySelector('[aria-pressed="true"]');
+  if (!active) return;
+  const to = { x: active.offsetLeft, width: active.offsetWidth };
+  if (pillPlaced && !reduced) play(pill, to, spring);
+  else Object.assign(pill.style, { transform: `translateX(${to.x}px)`, width: to.width + 'px' });
+  pillPlaced = true;
+}
+addEventListener('resize', () => { pillPlaced = false; movePill(); });
+
+// ---------- motion ----------
+// Delay grows with a cell's distance from cell `from`, so effects ripple outward.
+const rippleDelay = (from, step) => (i) =>
+  Math.hypot(((i / 9) | 0) - ((from / 9) | 0), (i % 9) - (from % 9)) * step;
+
+function popCell(i) {
+  play(cellEls[i].querySelector('.v'), { scale: [1.6, 1], opacity: [0.2, 1] }, { type: 'spring', stiffness: 600, damping: 16 });
+}
+
+function boardIn() {
+  play(cellEls, { opacity: [0, 1], scale: [0.5, 1] }, { delay: rippleDelay(40, 0.035), type: 'spring', stiffness: 380, damping: 24 });
+}
+
+function celebrate(from) {
+  play(cellEls, { scale: [1, 1.14, 1], y: [0, -4, 0] }, { delay: rippleDelay(from, 0.06), duration: 0.5, ease: 'easeInOut' });
+  if (reduced) return;
+  const box = els.board.getBoundingClientRect();
+  const colors = ['#d9622b', '#f2a43a', '#1f5fbf', '#3aa675', '#c2479b'];
+  const bits = Array.from({ length: 48 }, (_, k) => {
+    const el = document.createElement('i');
+    el.className = 'confetti';
+    el.style.background = colors[k % colors.length];
+    el.style.left = box.left + box.width / 2 + 'px';
+    el.style.top = box.top + box.height / 2 + 'px';
+    document.body.appendChild(el);
+    return el;
+  });
+  play(bits, {
+    x: () => (Math.random() - 0.5) * innerWidth * 0.9,
+    y: () => (Math.random() - 0.7) * innerHeight * 0.8,
+    rotate: () => (Math.random() - 0.5) * 900,
+    opacity: [1, 1, 0],
+  }, { duration: 1.6, ease: [0.16, 1, 0.3, 1] }).finished.then(() => bits.forEach((b) => b.remove()));
 }
 
 // ---------- actions ----------
@@ -201,7 +256,9 @@ function input(d) {
     S.notes[selected] = 0;
     for (const j of PEERS[selected]) S.notes[j] &= ~(1 << (d - 1));
   }
+  const at = selected;
   afterChange();
+  if (!noteMode) popCell(at);
 }
 
 function erase() {
@@ -246,12 +303,15 @@ function hint() {
   selected = i;
   afterChange();
   setStatus(`Hints used: ${S.hints}`);
+  popCell(i);
+  play(cellEls[i], { scale: [1, 1.18, 1] }, { duration: 0.5 });
 }
 
 function check() {
   if (!S || S.done) return;
   wrongMarks = new Set(S.cells.map((v, k) => (v && v !== S.solution[k] ? k : -1)).filter((k) => k >= 0));
   render();
+  if (wrongMarks.size) play([...wrongMarks].map((k) => cellEls[k]), { x: [0, -5, 5, -4, 4, 0] }, { duration: 0.4 });
   setStatus(wrongMarks.size ? `${wrongMarks.size} wrong ${wrongMarks.size === 1 ? 'digit is' : 'digits are'} marked in red.` : 'Every digit you entered so far is correct.');
 }
 
@@ -265,6 +325,7 @@ function afterChange() {
 
 function win() {
   S.done = true;
+  celebrate(selected >= 0 ? selected : 40);
   const best = store.get(BEST_KEY, {});
   let msg = `${LEVELS[S.level].label} level, time ${fmt(S.seconds)}, hints used ${S.hints}.`;
   if (S.hints === 0) {
@@ -281,7 +342,11 @@ function win() {
   render();
   persist();
   els.winText.textContent = msg;
-  els.win.showModal();
+  // Let the board ripple play before the dialog opens.
+  setTimeout(() => {
+    els.win.showModal();
+    play(els.win, { opacity: [0, 1], y: [30, 0], scale: [0.9, 1] }, spring);
+  }, reduced ? 0 : 900);
 }
 
 // ---------- events ----------
@@ -327,6 +392,8 @@ setInterval(() => {
 document.addEventListener('visibilitychange', () => document.hidden && persist());
 
 // ---------- init ----------
+rise('.wrap > *');
+interactive('.btn, .pad button, .levels button', { lift: 1.05, sink: 0.92 });
 const saved = store.get(SAVE_KEY, null);
 if (validSave(saved) && !saved.done) {
   noteMode = !!saved.noteMode;

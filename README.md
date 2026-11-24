@@ -24,6 +24,10 @@ The generator builds puzzles with a unique solution, then rates difficulty with 
 
 This is a simple difficulty measure. Advanced techniques such as pairs, X-wing or chains are not rated one by one.
 
+## Motion
+
+Animations use [Motion](https://motion.dev) (MIT), vendored as a single file in `shared/vendor/motion.js` so the site still needs no build step, network or install. `shared/fx.js` wraps it and skips every effect when the visitor prefers reduced motion. To update, bundle `animate, stagger, hover, press, spring` from the `motion` package with esbuild (`--bundle --minify --format=esm`).
+
 ## Running locally
 
 ```bash
