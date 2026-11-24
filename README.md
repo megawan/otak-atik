@@ -9,6 +9,7 @@ The name *otak-atik* is Indonesian for "to tinker", as in tinkering with a probl
 | Folder | Puzzle |
 | --- | --- |
 | [`sudoku/`](sudoku) | Sudoku in five levels: Newbie, Easy, Medium, Hard, Extreme. Pencil notes, undo, hints, check, timer, best time per level, and a game that resumes after the page is closed. |
+| [`rush-hour/`](rush-hour) | Rush Hour: slide the cars out of a traffic jam and drive the red car out. Sixty levels in six tiers (Newbie to Extreme), undo, restart, stars for the fewest moves and best moves saved per level. |
 
 ## Sudoku levels
 
@@ -23,6 +24,21 @@ The generator builds puzzles with a unique solution, then rates difficulty with 
 | Extreme | ≤ 25 | Singles get stuck, 37+ cells left (needs advanced techniques or guessing) |
 
 This is a simple difficulty measure. Advanced techniques such as pairs, X-wing or chains are not rated one by one.
+
+## Rush Hour levels
+
+Levels are fixed boards in `rush-hour/levels.js`, ten per tier, ordered by the fewest moves needed (one move slides one car any distance). The tests solve every level with a breadth-first search and check that the stored number is exact:
+
+| Tier | Fewest moves |
+| --- | --- |
+| Newbie | 3–7 |
+| Easy | 8–12 |
+| Medium | 13–18 |
+| Hard | 19–25 |
+| Expert | 26–33 |
+| Extreme | 34–40 |
+
+Three stars for the fewest moves, two for up to half as many again, otherwise one.
 
 ## Running locally
 
