@@ -1,5 +1,6 @@
 import { LEVELS } from './levels.js';
 import { carSvg } from './car-art.js';
+import { play, rise, interactive, spring } from '../shared/fx.js';
 import { N, TIERS, parse, reach, isSolved, starsFor } from './engine.js';
 
 const $ = (s) => document.querySelector(s);
@@ -65,6 +66,8 @@ function renderMenu() {
     root.append(sec);
   });
   $('#total').textContent = `${got} / ${all} stars`;
+  rise(root.children, { gap: 0.05, from: 14 });
+  interactive('.lv', { lift: 1.06, sink: 0.94 });
 }
 
 // ---- play ----
@@ -188,6 +191,7 @@ function win() {
     $('#win-text').textContent = `${moves} ${moves === 1 ? 'move' : 'moves'}${moves <= G.min ? ', the fewest possible.' : `. The fewest possible is ${G.min}.`}`;
     $('#win-next').hidden = !nextLevel();
     $('#win').showModal();
+    play('#win-stars', { scale: [0.6, 1] }, spring);
     ($('#win-next').hidden ? $('#win-menu') : $('#win-next')).focus();
   }, reduced ? 0 : 950);
 }
@@ -213,4 +217,5 @@ $('#back').addEventListener('click', toMenu);
 $('#win-menu').addEventListener('click', toMenu);
 $('#win-again').addEventListener('click', () => { const { ti, n } = G; $('#win').close(); start(ti, n); });
 $('#win-next').addEventListener('click', () => { const [ti, n] = nextLevel(); $('#win').close(); start(ti, n); });
+interactive('.btn');
 renderMenu();

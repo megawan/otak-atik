@@ -40,6 +40,10 @@ Levels are fixed boards in `rush-hour/levels.js`, ten per tier, ordered by the f
 
 Three stars for the fewest moves, two for up to half as many again, otherwise one.
 
+## Motion
+
+Animations use [Motion](https://motion.dev) (MIT), vendored as a single file in `shared/vendor/motion.js` so the site still needs no build step, network or install. `shared/fx.js` wraps it and skips every effect when the visitor prefers reduced motion. To update, bundle `animate, stagger, hover, press, spring` from the `motion` package with esbuild (`--bundle --minify --format=esm`).
+
 ## Running locally
 
 ```bash
