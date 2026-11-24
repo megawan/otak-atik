@@ -7,33 +7,71 @@
   <meta name="description" content="A collection of puzzles for adults. Free, no account, runs in your browser.">
   <link rel="stylesheet" href="shared/style.css">
   <style>
-    h1 { font-size: 2.4rem; margin: 32px 0 4px; letter-spacing: -0.02em; }
-    .cards { display: grid; gap: 12px; margin-top: 24px; }
+    h1 { font-size: clamp(2.4rem, 11vw, 3.4rem); margin: 40px 0 6px; letter-spacing: -0.03em; line-height: 1.05; }
+    .logo { display: inline-block; transform-origin: 50% 80%; }
+    .cards { display: grid; gap: 14px; margin-top: 28px; }
     .card {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 16px;
       text-decoration: none;
       background: var(--surface);
       border: 1.5px solid var(--line);
       border-radius: var(--radius);
       padding: 18px 20px;
+      box-shadow: var(--shadow);
+      transition: border-color .2s;
     }
     .card:hover { border-color: var(--accent); }
+    .card .icon {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      font-size: 1.7rem;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, var(--surface)), color-mix(in srgb, var(--accent-2) 30%, var(--surface)));
+    }
     .card h2 { margin: 0 0 2px; font-size: 1.25rem; }
     .card p { margin: 0; }
+    .card .go { margin-left: auto; font-size: 1.4rem; color: var(--accent); }
     footer { margin-top: 40px; font-size: .875rem; }
   </style>
 </head>
 <body>
   <main class="wrap">
-    <h1>Otak-Atik 🧩</h1>
+    <h1><span class="grad">Otak-Atik</span> <span class="logo" id="logo">🧩</span></h1>
     <p class="muted">A collection of puzzles for adults. No account, no ads. Your progress is saved in your browser.</p>
     <div class="cards">
       <a class="card" href="sudoku/">
-        <h2>🔢 Sudoku</h2>
-        <p class="muted">Five levels, from Newbie to Extreme. With pencil notes, undo and hints.</p>
+        <span class="icon" aria-hidden="true">🔢</span>
+        <span>
+          <h2>Sudoku</h2>
+          <p class="muted">Five levels, from Newbie to Extreme. With pencil notes, undo and hints.</p>
+        </span>
+        <span class="go" aria-hidden="true">→</span>
       </a>
     </div>
     <footer class="muted">All data stays on your device. Clearing the site data clears your progress.</footer>
   </main>
+  <script type="module">
+    import { play, rise, interactive, spring } from './shared/fx.js';
+    import { hover } from './shared/vendor/motion.js';
+
+    rise('.wrap > :not(.cards), .card', { gap: 0.09, from: 24 });
+
+    // The puzzle piece wobbles on load, then again whenever it is hovered.
+    const wobble = () => play('#logo', { rotate: [0, -14, 10, -6, 0], scale: [1, 1.2, 1] }, { duration: 0.8 });
+    setTimeout(wobble, 500);
+    hover('#logo', () => { wobble(); });
+
+    interactive('.card', { lift: 1.02, sink: 0.98 });
+    hover('.card', (el) => {
+      const go = el.querySelector('.go');
+      play(go, { x: 6 }, spring);
+      return () => play(go, { x: 0 }, spring);
+    });
+  </script>
 </body>
 </html>

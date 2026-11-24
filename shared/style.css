@@ -7,7 +7,10 @@
   --line-strong: #2b2620;
   --accent: #d9622b;
   --accent-ink: #fff;
-  --radius: 14px;
+  --accent-2: #f2a43a;
+  --glow: rgb(217 98 43 / .22);
+  --shadow: 0 1px 2px rgb(60 40 20 / .06), 0 8px 24px rgb(60 40 20 / .08);
+  --radius: 18px;
   color-scheme: light;
 }
 
@@ -21,7 +24,10 @@
     --line-strong: #efe8da;
     --accent: #f08a52;
     --accent-ink: #1b1814;
-                color-scheme: dark;
+    --accent-2: #f5b95c;
+    --glow: rgb(240 138 82 / .2);
+    --shadow: 0 1px 2px rgb(0 0 0 / .3), 0 10px 28px rgb(0 0 0 / .35);
+    color-scheme: dark;
   }
 }
 
@@ -31,7 +37,12 @@ html { -webkit-text-size-adjust: 100%; }
 
 body {
   margin: 0;
-  background: var(--bg);
+  min-height: 100vh;
+  background:
+    radial-gradient(60rem 36rem at 90% -10%, var(--glow), transparent 60%),
+    radial-gradient(48rem 30rem at -10% 110%, color-mix(in srgb, var(--accent-2) 18%, transparent), transparent 60%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--ink);
   font: 16px/1.5 ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -62,15 +73,28 @@ a:focus-visible {
   border-radius: 999px;
   padding: 8px 16px;
   min-height: 44px;
+  box-shadow: var(--shadow);
+  transition: border-color .2s, background-color .2s, color .2s;
 }
 
 .btn:hover { border-color: var(--ink); }
 
 .btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
   color: var(--accent-ink);
   font-weight: 600;
 }
 
 .muted { color: var(--muted); }
+
+.grad {
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .01ms !important; }
+}
